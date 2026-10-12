@@ -24,7 +24,8 @@ end
 ##### struct for plankton (phytoplankton/zooplankton)
 ##### similar to Field in PlanktonKernels, but bc replaced with a NamedTuple of parameters
 mutable struct PlanktonTracer
-    data::NamedTuple
+    fields::NamedTuple
+    procs::NamedTuple
     p::NamedTuple
 end
 
@@ -35,23 +36,25 @@ mutable struct plankton_setup
     zoo_init::NamedTuple
     phyto_Nsp::Int64
     zoo_Nsp::Int64
+    palat::AbstractArray
 end
 
 mutable struct timestepper
     bgc_Gcs::NamedTuple                         # a NamedTuple same as bgc tracers to store tendencies
-    bgc_tracer_tmp::NamedTuple                  # a NamedTuple same as bgc tracers to store tracers fields in multi-dims advection scheme
-    plankton_Gcs::NamedTuple                    # a NamedTuple same as plankton tracers to store tendencies
-    plankton_tracer_tmp::NamedTuple             # a NamedTuple same as plankton tracers to store tracers fields in multi-dims advection scheme
-    vel₀::NamedTuple                            # a NamedTuple with u, v, w velocities
-    vel½::NamedTuple                            # a NamedTuple with u, v, w velocities
-    vel₁::NamedTuple                            # a NamedTuple with u, v, w velocities
+    bgc_tmp::NamedTuple                         # a NamedTuple same as bgc tracers to store tracers fields in multi-dims advection scheme
+    phyto_Gcs::NamedTuple                       # a NamedTuple same as phytoplankton tracers to store tendencies
+    phyto_tmp::NamedTuple                       # a NamedTuple same as phytoplankton tracers to store tracers fields in multi-dims advection scheme
+    zoo_Gcs::NamedTuple                         # a NamedTuple same as zooplankton tracers to store tendencies
+    zoo_tmp::NamedTuple                         # a NamedTuple same as zooplankton tracers to store tracers fields in multi-dims advection scheme
+    vel::NamedTuple                             # a NamedTuple with u, v, w velocities
     PARF::AbstractArray                         # a (Cu)Array to store surface PAR field of each timestep
     temp::AbstractArray                         # a (Cu)Array to store temperature field of each timestep
-    flux_sink::AbstractArray                    # a (Cu)Array to store sinking flux field of each timestep
+    f_sink::AbstractArray                       # a (Cu)Array to store sinking flux field of each timestep
     plk::NamedTuple                             # a NamedTuple same as bgc tracers to store interactions with plankton fields
     par::AbstractArray                          # a (Cu)Array to store PAR field of each timestep
     par₀::AbstractArray                         # a (Cu)Array to store PAR field of the previous timestep
     Chl::AbstractArray                          # a (Cu)Array to store total chlorophyll field of each timestep
+    palat::AbstractArray                        # a (Cu)Array to store palatability between phytoplankton and zooplankton
 end
 
 mutable struct ModelOpts
@@ -74,8 +77,8 @@ mutable struct PlanktonModel
 end
 
 mutable struct PlanktonDiagnostics
-    phyto_tracers::NamedTuple          # for each species of phytoplankton
-    zoo_tracers::NamedTuple            # for each species of zooplankton
+    phytos::NamedTuple                 # for each species of phytoplankton
+    zoos::NamedTuple                   # for each species of zooplankton
     bgc_tracers::NamedTuple            # for tracers
     iteration_interval::Int            # time interval that the diagnostics is time averaged
 end

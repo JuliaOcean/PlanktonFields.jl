@@ -37,7 +37,7 @@ function write_diags_to_jld2(diags, filepath, t, iter, ncounts, grid)
         for key in keys(diags.bgc_tracers)
             file["timeseries/$key/$iter"] = Array(interior(diags.bgc_tracers[key], grid)) ./ ncounts
         end
-        for (group, species) in (("phytoplankton", diags.phyto_tracers), ("zooplankton", diags.zoo_tracers))
+        for (group, species) in (("phytoplankton", diags.phytos), ("zooplankton", diags.zoos))
             for sp in keys(species), proc in keys(species[sp])
                 file["timeseries/$group/$sp/$proc/$iter"] = Array(interior(species[sp][proc], grid)) ./ ncounts
             end
@@ -47,7 +47,7 @@ function write_diags_to_jld2(diags, filepath, t, iter, ncounts, grid)
     for tr in diags.bgc_tracers
         tr .= 0.0f0
     end
-    for species in (diags.phyto_tracers, diags.zoo_tracers), sp in species, proc in sp
+    for species in (diags.phytos, diags.zoos), sp in species, proc in sp
         proc .= 0
     end
     return nothing

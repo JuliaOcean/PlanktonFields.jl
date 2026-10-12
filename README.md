@@ -1,5 +1,8 @@
 # PlanktonFields.jl
 
+[![CI](https://github.com/JuliaOcean/PlanktonFields.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaOcean/PlanktonFields.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/JuliaOcean/PlanktonFields.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaOcean/PlanktonFields.jl)
+
 **PlanktonFields.jl** is a Julia framework for Eulerian plankton ecosystem modeling using gridded state variables and continuous differential equations. Plankton populations and associated biogeochemical quantities are represented as spatial fields whose temporal evolution is described through coupled differential equations for processes such as growth, nutrient uptake, mortality, and elemental cycling.
 
 PlanktonFields.jl is built on **PlanktonKernels.jl**, which provides the shared computational infrastructure for plankton ecosystem models, including computational architectures, spatial grids, fields, transport operators, tracers, and related numerical utilities. By relying on the same numerical foundation, PlanktonFields.jl can remain focused on the formulation and solution of Eulerian plankton ecosystem models.

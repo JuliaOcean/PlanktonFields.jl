@@ -9,8 +9,8 @@ Generate a `PlanktonDiagnostics` structure.
 Keyword Arguments (Optional)
 ============================
 - `tracer` : a `Tuple` containing the names of nutrient fields to be diagnosed.
-- `phytoplankton` : a `Tuple` containing the names of physiological processes of phytoplankton individuals to be diagnosed.
-- `zooplankton` : a `Tuple` containing the names of physiological processes of zooplankton individuals to be diagnosed.
+- `phytoplankton` : a `Tuple` containing the names of state variables or process fluxes of phytoplankton to be diagnosed.
+- `zooplankton` : a `Tuple` containing the names of state variables or process fluxes of zooplankton to be diagnosed.
 - `iteration_interval` : The number of timesteps that diagnostics is averaged, 1 iteration by default.
 """
 function PlanktonDiagnostics(model; tracer=(),
@@ -82,15 +82,15 @@ end
 function show(io::IO, diags::PlanktonDiagnostics)
     print(io, "PlanktonDiagnostics:\n",
               "├── diagnostics of BGC tracers: $(keys(diags.bgc_tracers))\n",
-              "├── diagnostics of phytoplankton: $(keys(diags.phyto_tracers))\n",
-              "├── diagnostics of zooplankton: $(keys(diags.zoo_tracers))\n",
+              "├── diagnostics of phytoplankton: $(keys(diags.phytos))\n",
+              "├── diagnostics of zooplankton: $(keys(diags.zoos))\n",
               "└── save averaged diagnostics every $(diags.iteration_interval) timesteps")
 end
 
 function diag_avail(tracer, plank, zoo, model)
     tracer_avail = tracer_avail_diags()
-    plank_avail = keys(model.plankton.phytos.sp1.data)
-    zoo_avail = keys(model.plankton.zoos.sp1.data)
+    plank_avail = (keys(model.plankton.phytos.sp1.fields)..., keys(model.plankton.phytos.sp1.procs)...)
+    zoo_avail = (keys(model.plankton.zoos.sp1.fields)..., keys(model.plankton.zoos.sp1.procs)...)
 
     for i in eachindex(tracer)
         if tracer[i] ∉ tracer_avail

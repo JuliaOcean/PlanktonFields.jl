@@ -1,9 +1,14 @@
 function construct_phytoplankton(arch::Architecture, sp::Int, params::Dict, FT::DataType, g::AbstractGrid)
     # construct phytoplankton tracer fields
-    phyto_tracer_names = (:Chl, :C, :PS, :RS, :mort, :graz)
-    data = init_tracers(arch, g, phyto_tracer_names, FT)
+    phyto_field_names = (:Chl, :C)
+    fields = init_tracers(arch, g, phyto_field_names, FT)
+    phyto_proc_names = (:PS, :VNO3, :VNH4, :VPO4, :BS, :SChl, :RS, :mort, :graz)
+    procs = init_tracers(arch, g, phyto_proc_names, FT)
 
-    param_names=(:Cquota, :Chl2C, :α, :Φ, :Topt, :Tmax, :Ea_ref, :Topt_ref, :PCmax, :respir, :k_mort, :grazFracC, :mortFracC)
+    param_names=(:κh, :κv, :Cquota, :Chl2Cmin, :Chl2Cmax, :τChl, :α, :Φ, 
+                 :Topt, :Tmax, :Ea_ref, :Topt_ref, 
+                 :PCmax, :VNO3max, :VNH4max, :VPO4max, :KsatNH4, :KsatNO3, :KsatPO4,
+                 :R_NC, :R_PC, :k_RS, :k_mort, :grazFracC, :mortFracC)
 
     # construct phytoplankton parameters
     pkeys = Symbol.(collect(keys(params)))
@@ -17,15 +22,18 @@ function construct_phytoplankton(arch::Architecture, sp::Int, params::Dict, FT::
     end
     p = NamedTuple{param_names}(FT.(tmp))
 
-    return PlanktonTracer(data, p)
+    return PlanktonTracer(fields, procs, p)
 end
 
 function construct_zooplankton(arch::Architecture, sp::Int, params::Dict, FT::DataType, g::AbstractGrid)
     # construct zooplankton tracer fields
-    zoo_tracer_names = (:C, :G, :RS, :mort,)
-    data = init_tracers(arch, g, zoo_tracer_names, FT)
+    zoo_field_names = (:C, )
+    fields = init_tracers(arch, g, zoo_field_names, FT)
+    zoo_proc_names = (:G, :RS, :mort)
+    procs = init_tracers(arch, g, zoo_proc_names, FT)
 
-    param_names=(:Cquota, :Topt, :Tmax, :Ea_ref, :Topt_ref, :Gmax, :respir, :k_mort,  :mortFracC)
+    param_names=(:κh, :κv, :Cquota, :Topt, :Tmax, :Ea_ref, :Topt_ref, 
+                 :Gmax, :Gfrac, :R_NC, :R_PC, :k_RS, :k_mort,  :mortFracC)
 
     # construct zooplankton parameters
     pkeys = Symbol.(collect(keys(params)))
@@ -39,7 +47,7 @@ function construct_zooplankton(arch::Architecture, sp::Int, params::Dict, FT::Da
     end
     p = NamedTuple{param_names}(FT.(tmp))
 
-    return PlanktonTracer(data, p)
+    return PlanktonTracer(fields, procs, p)
 end
 
 function initialize_phytoplankton!(phytos, source::NamedTuple, grid::AbstractGrid, arch::Architecture, FT::DataType)
@@ -48,7 +56,7 @@ function initialize_phytoplankton!(phytos, source::NamedTuple, grid::AbstractGri
         if !(phyto_names[sp] ∈ keys(source))
             throw(ArgumentError("Source for phytoplankton $(phyto_names[sp]) not found"))
         end
-        phyto = phytos[sp].data
+        phyto = phytos[sp].fields
         fieldnames =  (:Chl, :C)
         for f in fieldnames
             if !(f ∈ keys(source[sp]))
@@ -67,7 +75,7 @@ function initialize_zooplankton!(zoos, source::NamedTuple, grid::AbstractGrid, a
         if !(zoo_names[sp] ∈ keys(source))
             throw(ArgumentError("Source for zooplankton $(zoo_names[sp]) not found"))
         end
-        zoo = zoos[sp].data
+        zoo = zoos[sp].fields
         fieldnames =  (:C,)
         for f in fieldnames
             if !(f ∈ keys(source[sp]))

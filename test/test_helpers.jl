@@ -12,7 +12,7 @@ end
 function carbon_mass(model)
     mass = sum(field_mass(model.bgc_tracers[n],model.grid) for n in (:DIC,:DOC,:POC))
     for species in (model.plankton.phytos,model.plankton.zoos), plank in species
-        mass += field_mass(plank.data.C,model.grid)
+        mass += field_mass(plank.fields.C,model.grid)
     end
     return mass
 end
@@ -33,13 +33,13 @@ function test_carbon_example(size; moving=false)
         @test minimum(interior(field,model.grid)) >= -1e-12
     end
     for species in (model.plankton.phytos,model.plankton.zoos), plank in species
-        @test all(isfinite,interior(plank.data.C,model.grid))
-        @test minimum(interior(plank.data.C,model.grid)) >= 0
+        @test all(isfinite,interior(plank.fields.C,model.grid))
+        @test minimum(interior(plank.fields.C,model.grid)) >= 0
     end
 end
 
 function test_diagnostics(model; kwargs...)
     return PlanktonDiagnostics(model;
-        phytoplankton=keys(model.plankton.phytos.sp1.data),
-        zooplankton=keys(model.plankton.zoos.sp1.data), kwargs...)
+        phytoplankton=(keys(model.plankton.phytos.sp1.fields)..., keys(model.plankton.phytos.sp1.procs)...),
+        zooplankton=(keys(model.plankton.zoos.sp1.fields)..., keys(model.plankton.zoos.sp1.procs)...), kwargs...)
 end

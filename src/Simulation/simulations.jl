@@ -143,7 +143,7 @@ end
 
 function short_show(diags::PlanktonDiagnostics)
     return string("\n", "│   ├── diagnostics of tracers: $(keys(diags.bgc_tracers))\n", 
-                        "│   ├── diagnostics of phytoplankton: $(keys(diags.phyto_tracers))\n",
+                        "│   ├── diagnostics of phytoplankton: $(keys(diags.phytos))\n",
                         "│   └── save averaged diagnostics every $(diags.iteration_interval) timesteps")
 end
 function short_show(writer::PlanktonOutputWriter)

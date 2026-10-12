@@ -1,20 +1,17 @@
 module Plankton
 
-export phyto_params_default, update_phyto_params, zoo_params_default, update_zoo_params
-
-using KernelAbstractions
+using KernelAbstractions: @kernel, @index
 
 using PlanktonKernels.Architectures: device, Architecture
-using PlanktonKernels.Fields: Field, fill_halo_tracer!
+using PlanktonKernels.Fields: fill_halo_tracer!, zero_fields!
+using PlanktonKernels.Transport: tracer_advection!, tracer_diffusion!
 using PlanktonKernels.Grids: AbstractGrid, volume, ΔzF
 
-using PlanktonFields: CarbonMode, AbstractMode, PlanktonTracer, PlanktonTracers, plankton_setup
+using PlanktonFields: CarbonMode, QuotaMode, AbstractMode, PlanktonTracers, plankton_setup
 
 include("plankton_params.jl")
-include("CarbonMode/CarbonMode.jl")
 include("utils.jl")
-
-import .Carbon
+include("CarbonMode/CarbonMode.jl")
 
 #####
 ##### generate plankton of multiple species
@@ -57,6 +54,7 @@ initialize_zooplankton!(zoos, source::NamedTuple, grid::AbstractGrid, arch::Arch
 phyto_tracer_default_init(mode::CarbonMode) = Carbon.phyto_tracer_default_init()
 zoo_tracer_default_init(mode::CarbonMode) = Carbon.zoo_tracer_default_init()
 
-phyto_update!(phyto::PlanktonTracer, bgc_tracers::NamedTuple, plk, par, temp, arch::Architecture, grid::AbstractGrid, ΔT::Real, mode::CarbonMode) = Carbon.phyto_update!(phyto, bgc_tracers, plk, par, temp, arch, grid, ΔT, mode)
+plankton_update!(plankton::PlanktonTracers, bgc_tracers::NamedTuple, timestepper, grid::AbstractGrid, ΔT::Real, arch::Architecture, mode::CarbonMode) = Carbon.plankton_update!(plankton, bgc_tracers, timestepper, grid, ΔT, arch)
+
 
 end

@@ -31,6 +31,8 @@ Keyword Arguments (Optional)
 - `tracer_initial` : The source of initial conditions of tracer fields, should be either a `NamedTuple` 
                     or a `Dict` containing the file paths pointing to the files of nutrient initial conditions.
 - `plankton`: `plankton_setup(params=..., Nsp=...)` for CarbonMode species; `nothing` creates no plankton.
+- Palatability: `plankton.palat` has size `(phyto_Nsp, zoo_Nsp)` with finite values in `[0, 1]`.
+                    It is copied to the model floating-point type and architecture.
 - `t` : Model time, start from 0 by default, in second.
 """
 function PlanktonModel(arch::Architecture, grid::AbstractGrid;
@@ -70,20 +72,28 @@ function PlanktonModel(arch::Architecture, grid::AbstractGrid;
         zoo_init = zoo_tracer_default_init(mode)
         phyto_params = phyto_params_default(phyto_Nsp, mode)
         zoo_params = zoo_params_default(zoo_Nsp, mode)
-        plankton = plankton_setup(phyto_params, zoo_params, phyto_init, zoo_init, phyto_Nsp, zoo_Nsp)
+        palat = ones(FT, phyto_Nsp, zoo_Nsp) |> array_type(arch)
+        plankton = plankton_setup(phyto_params, zoo_params, phyto_init, zoo_init, phyto_Nsp, zoo_Nsp, palat)
     elseif plankton isa plankton_setup
+        phyto_Nsp = plankton.phyto_Nsp
+        zoo_Nsp = plankton.zoo_Nsp
         plankton.phyto_params = update_phyto_params(plankton.phyto_params, FT; N=plankton.phyto_Nsp, mode=mode)
         plankton.zoo_params = update_zoo_params(plankton.zoo_params, FT; N=plankton.zoo_Nsp, mode=mode)
     else
         throw(ArgumentError("plankton must be nothing or plankton_setup"))
     end
-    plankton_tracers = generate_plankton_tracers(plankton, arch, FT, grid_d, mode)
+    expected_size = (phyto_Nsp, zoo_Nsp)
+    size(plankton.palat) == expected_size ||
+        throw(ArgumentError("Palatability must be a matrix of size $expected_size (phytoplankton × zooplankton)"))
+    all(x -> x isa Real && isfinite(x) && 0 <= x <= 1, plankton.palat) ||
+        throw(ArgumentError("Palatability entries must be finite real values between 0 and 1"))
+    palat = FT.(plankton.palat)
 
-    plankton_tracer_names = keys(plankton_tracers.phytos)
+    plankton_tracers = generate_plankton_tracers(plankton, arch, FT, grid_d, mode)
 
     bgc_tracers = generate_bgc_tracers(arch, grid_d, tracer_initial, FT)
 
-    ts = timestepper(plankton_tracer_names, arch, FT, grid_d)
+    ts = timestepper(plankton_tracers, arch, FT, grid_d, palat)
 
     iteration  = 0
 

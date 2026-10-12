@@ -1,4 +1,5 @@
 using Test
+import PlanktonKernels
 using PlanktonFields
 using PlanktonFields.Simulation: update!
 using PlanktonKernels: CPU, RectilinearGrid, interior
@@ -12,6 +13,7 @@ include("test_helpers.jl")
     @testset "Unit tests" begin
         include("model_test.jl")
         include("parameter_test.jl")
+        include("palatability_test.jl")
         include("simulation_test.jl")
         include("diagnostics_test.jl")
         include("output_test.jl")

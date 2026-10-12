@@ -17,7 +17,7 @@ export
     # Mode defaults and model parameter updates
     phyto_params_default, update_phyto_params,
     zoo_params_default, update_zoo_params,
-    default_PARF, default_temp,
+    default_PARF,
 
     # Output
     PlanktonDiagnostics, PlanktonOutputWriter
@@ -25,7 +25,6 @@ export
 
 using PlanktonKernels.Architectures: Architecture
 using PlanktonKernels.Grids: AbstractGrid
-using PlanktonKernels.Fields: Field
 
 include("model_structs.jl")
 include("Plankton/Plankton.jl")
@@ -34,8 +33,10 @@ include("Diagnostics/Diagnostics.jl")
 include("Output/Output.jl")
 include("Simulation/Simulation.jl")
 
-using .Model
 using .Plankton
+using .Model
+using .Diagnostics
+using .Output
 using .Simulation
 
 end
