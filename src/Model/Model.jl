@@ -1,5 +1,7 @@
 module Model
 
+export model_options
+
 import PlanktonFields: PlanktonModel, timestepper
 using PlanktonFields: AbstractMode, CarbonMode, plankton_setup, ModelOpts, PlanktonDiagnostics
 

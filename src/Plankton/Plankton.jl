@@ -1,5 +1,7 @@
 module Plankton
 
+export phyto_params_default, update_phyto_params, zoo_params_default, update_zoo_params
+
 using KernelAbstractions: @kernel, @index
 
 using PlanktonKernels.Architectures: device, Architecture

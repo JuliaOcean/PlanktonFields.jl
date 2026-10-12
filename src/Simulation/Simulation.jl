@@ -1,5 +1,7 @@
 module Simulation
 
+export update!, set_vels_fields!, set_PARF_fields!, set_temp_fields!, default_PARF
+
 import PlanktonFields: PlanktonInput, PlanktonSimulation
 
 using PlanktonKernels.Architectures: CPU

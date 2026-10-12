@@ -19,4 +19,8 @@ grid = RectilinearGrid(size=(8, 8, 4), x=(0, 100), y=(0, 100), z=(0, -20))
 model = PlanktonModel(CPU(), grid)
 diags = PlanktonDiagnostics(model; tracer=(:DIC, :NO3))
 sim = PlanktonSimulation(model; ΔT=60, iterations=10, diags=diags)
+update!(sim)
+
+# Inspect the interior dissolved inorganic carbon concentration.
+interior(model.bgc_tracers.DIC, grid)
 ```

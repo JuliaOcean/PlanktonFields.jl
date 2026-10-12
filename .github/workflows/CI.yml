@@ -28,23 +28,10 @@ jobs:
           - ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # The registered Kernels release does not yet provide the required tracer API.
-      - name: Check out PlanktonKernels
-        uses: actions/checkout@v7
-        with:
-          repository: JuliaOcean/PlanktonKernels.jl
-          ref: main
-          path: .ci/PlanktonKernels.jl
       - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v3
-      - name: Use development PlanktonKernels
-        shell: julia --color=yes --project=. {0}
-        run: |
-          using Pkg
-          Pkg.develop(path=".ci/PlanktonKernels.jl")
-          Pkg.instantiate()
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
